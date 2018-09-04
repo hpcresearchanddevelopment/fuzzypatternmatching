@@ -42,10 +42,10 @@
 //#include <havoqgt/token_passing_pattern_matching_nonunique_nem.hpp> // TP_ASYNC // nonunique path checking, edge monocyclic 
 #include <havoqgt/token_passing_pattern_matching_nonunique_nem_1.hpp> // TP_ASYNC // nonunique path checking, edge monocyclic 
 //#include <havoqgt/token_passing_pattern_matching_nonunique_tds_1.hpp> // TP_ASYNC // nonunique path checking, edge monocyclic, tds
-//#include <havoqgt/token_passing_pattern_matching_nonunique_tds_batch_1.hpp>
+#include <havoqgt/token_passing_pattern_matching_nonunique_tds_batch_1.hpp>
 //#include <havoqgt/token_passing_pattern_matching_nonunique_tds_batch_2.hpp> // one set per rank
 //#include <havoqgt/token_passing_pattern_matching_nonunique_tds_batch_3.hpp> // one set per vertex
-#include <havoqgt/token_passing_pattern_matching_nonunique_tds_batch_4.hpp>
+//#include <havoqgt/token_passing_pattern_matching_nonunique_tds_batch_4.hpp>
 //#include <havoqgt/token_passing_pattern_matching_nonunique_iterative_tds_1.hpp> // TP_ASYNC // nonunique path checking, edge monocyclic, tds
 //#include <havoqgt/token_passing_pattern_matching_nonunique_iterative_tds_batch_1.hpp> // TP_ASYNC // nonunique path checking, edge monocyclic, tds, batching
 
@@ -215,10 +215,10 @@ int main(int argc, char** argv) {
   //  distributed_db::transfer(backup_filename.c_str(), graph_input.c_str());
   //}
   if (backup_graph_input.size() > 0) {
-    distributed_db::transfer(backup_graph_input.c_str(), graph_input.c_str());
+    distributed_db::transfer(backup_graph_input.c_str(), graph_input.c_str()); 
   }
 
-  havoqgt::distributed_db ddb(havoqgt::db_open(), graph_input.c_str());
+  havoqgt::distributed_db ddb(havoqgt::db_open(), graph_input.c_str()); // TODO: does not work, verify and fix the bug
 
   //segment_manager_t* segment_manager = ddb.get_segment_manager();
   //  bip::allocator<void, segment_manager_t> alloc_inst(segment_manager);
@@ -305,7 +305,7 @@ int main(int argc, char** argv) {
   typedef graph_type::edge_data<uint8_t, std::allocator<uint8_t> > EdgeActive; 
 
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching ... " << std::endl;
+    std::cout << "Exact Pattern Matching ... " << std::endl;
   }
 
   double time_start = MPI_Wtime();
@@ -340,7 +340,7 @@ int main(int argc, char** argv) {
   ////EdgeActive edge_active(*graph);
 
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching | Allocated Vertex and Edge Containers" << std::endl;
+    std::cout << "Exact Pattern Matching | Allocated Vertex and Edge Containers" << std::endl;
   }
 
   ///////////////////////////////////////////////////////////////////////////// 
@@ -380,7 +380,7 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD); // TODO: do we need this?
   time_end = MPI_Wtime();
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching Time | Vertex Data DB : " 
+    std::cout << "Exact Pattern Matching Time | Vertex Data DB : " 
       << time_end - time_start << std::endl;
   }
 
@@ -449,11 +449,10 @@ int main(int argc, char** argv) {
     pattern_input_filename + "_stat",
     false, false);
 
-  // TODO: can you create a graphic representation of the pattern 
-  // using a 2D graphics library?
+  // TODO: can you visualize the pattern using a 2D graphics library?
   // test print
   if(mpi_rank == 0) {
-  std::cout << "Fuzzy Pattern Matching | Searching Pattern [" << ps
+  std::cout << "Exact Pattern Matching | Searching Pattern [" << ps
     << "] : " << std::endl;
   for (auto v = 0; v < pattern_graph.vertex_count; v++) {
     std::cout << v << " : off-set " << pattern_graph.vertices[v] 
@@ -614,7 +613,7 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD); // TODO: might not need this here
   double label_propagation_time_end = MPI_Wtime();
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching Time | Label Propagation : " 
+    std::cout << "Exact Pattern Matching Time | Label Propagation : " 
       << label_propagation_time_end - label_propagation_time_start << std::endl;
   }
 
@@ -633,13 +632,13 @@ int main(int argc, char** argv) {
   } 
 
   // verify global termination condition
-  //std::cout << "Fuzzy Pattern Matching | Global Not Finished status (local) : " << global_not_finished << std::endl; // Test
+  //std::cout << "Exact Pattern Matching | Global Not Finished status (local) : " << global_not_finished << std::endl; // Test
   // global_not_finished = havoqgt::mpi::mpi_all_reduce(global_not_finished, std::logical_or<bool>(), MPI_COMM_WORLD); // does not work
   global_not_finished = havoqgt::mpi::mpi_all_reduce(global_not_finished, std::greater<uint8_t>(), MPI_COMM_WORLD); 
   MPI_Barrier(MPI_COMM_WORLD); // TODO: might not need this here 
 
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching | Global Finished Status : "; 
+    std::cout << "Exact Pattern Matching | Global Finished Status : "; 
     if (global_not_finished) { 
       std::cout << "Continue" << std::endl;
     } else {
@@ -662,11 +661,12 @@ int main(int argc, char** argv) {
 //  global_not_finished = global_active_vertex; // TODO: verify and fix
 
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching | Global Active Vertex Status : ";
+    std::cout << "Exact Pattern Matching | Global Active Vertex Status : ";
+    std::cout << "Not Available" << std::endl; // TODO: 
     if (global_active_vertex) {
-      std::cout << "Active vertices left." << std::endl;
+      //std::cout << "Active vertices left." << std::endl;
     } else {
-      std::cout << "No active vertex left." << std::endl;
+      //std::cout << "No active vertex left." << std::endl;
     }
   }
 
@@ -773,7 +773,7 @@ int main(int argc, char** argv) {
   // RDT_25
   //if (pl >= 4) {
   // /p/lscratchf/havoqgtu/reza2_tmp/WDC_patterns_12_tree_C_2 / C_4
-  if (pl >= 8) {
+  //if (pl >= 8) {
   // /p/lscratchf/havoqgtu/reza2_tmp/WDC_patterns_12_tree_C_2 - pruned graph
   //if (pl >= 0) {   
   // /p/lscratchf/havoqgtu/reza2_tmp/WDC_patterns_12_D
@@ -788,7 +788,7 @@ int main(int argc, char** argv) {
   //if (pl >= 6) {
   //if (pl >= 0) {
   // RMAT_tree
-  //if (pl >= 4) {
+  if (pl >= 4) {
     do_tds_tp = true;
     if(mpi_rank == 0) {
       std::cout << "Token Passing [" << pl << "] | Template Driven Search " << std::endl;
@@ -951,7 +951,7 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD); // TODO: do we need this here?    
   time_end = MPI_Wtime();
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching Time | Token Passing (Traversal) [" 
+    std::cout << "Exact Pattern Matching Time | Token Passing (Traversal) [" 
       << pl << "] : " << time_end - time_start << std::endl;
   }
 
@@ -983,10 +983,10 @@ int main(int argc, char** argv) {
   // only invalidate it as a token source, but do not remove it from the vertex_state_map
 
   uint64_t remove_count = 0;
-  size_t token_source_pattern_ndices_tp_index = 0; 
+  size_t token_source_pattern_indices_tp_index = 0; 
 
   if (pattern_selected_vertices_tp) {
-    token_source_pattern_ndices_tp_index = pattern_indices_tp.size() - 1; // Important     
+    token_source_pattern_indices_tp_index = pattern_indices_tp.size() - 1; // Important     
     //std::cout << "token_source_map.size() " << token_source_map.size() << std::endl; // Test
   }  
 
@@ -1010,9 +1010,9 @@ int main(int argc, char** argv) {
 
       //pattern_indices_tp[0]; // token source template vertex ID
 
-      if (v_template_vertices.test(pattern_indices_tp[token_source_pattern_ndices_tp_index])) {
-        assert(pattern_indices_tp[token_source_pattern_ndices_tp_index] < 16); // Test
-        v_template_vertices.reset(pattern_indices_tp[token_source_pattern_ndices_tp_index]);
+      if (v_template_vertices.test(pattern_indices_tp[token_source_pattern_indices_tp_index])) {
+        assert(pattern_indices_tp[token_source_pattern_indices_tp_index] < 16); // Test
+        v_template_vertices.reset(pattern_indices_tp[token_source_pattern_indices_tp_index]);
         template_vertices[v_locator] = v_template_vertices.to_ulong();
       }
 
@@ -1108,7 +1108,7 @@ int main(int argc, char** argv) {
 
   time_end = MPI_Wtime();
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching Time | Token Passing [" << pl 
+    std::cout << "Exact Pattern Matching Time | Token Passing [" << pl 
       << "] : " << time_end - time_start << std::endl;
   }
 
@@ -1215,7 +1215,7 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD); // TODO: might not need this here
   label_propagation_time_end = MPI_Wtime();
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching Time | Label Propagation (Interleaved) : " 
+    std::cout << "Exact Pattern Matching Time | Label Propagation (Interleaved) : " 
       << label_propagation_time_end - label_propagation_time_start << std::endl;
   }
 
@@ -1232,13 +1232,13 @@ int main(int argc, char** argv) {
   //} 
 
   // verify global termination condition
-  //std::cout << "Fuzzy Pattern Matching | Global Not Finished status (local) : " << global_not_finished << std::endl; // Test
+  //std::cout << "Exact Pattern Matching | Global Not Finished status (local) : " << global_not_finished << std::endl; // Test
   // global_not_finished = havoqgt::mpi::mpi_all_reduce(global_not_finished, std::logical_or<bool>(), MPI_COMM_WORLD); // does not work
 //--  global_not_finished = havoqgt::mpi::mpi_all_reduce(global_not_finished, std::greater<uint8_t>(), MPI_COMM_WORLD); 
 //--  MPI_Barrier(MPI_COMM_WORLD); // TODO: might not need this here 
 
 //--  if(mpi_rank == 0) {
-//--    std::cout << "Fuzzy Pattern Matching | Global Finished Status : "; 
+//--    std::cout << "Exact Pattern Matching | Global Finished Status : "; 
 //--    if (global_not_finished) { 
 //--      std::cout << "Continue" << std::endl;
 //--    } else {
@@ -1261,7 +1261,7 @@ int main(int argc, char** argv) {
 //  global_not_finished = global_active_vertex; // TODO: verify and fix
 
 //--  if(mpi_rank == 0) {
-//--    std::cout << "Fuzzy Pattern Matching | Global Active Vertex Status : ";
+//--    std::cout << "Exact Pattern Matching | Global Active Vertex Status : ";
 //--    if (global_active_vertex) {
 //--      std::cout << "Active vertices left." << std::endl;
 //--    } else {
@@ -1271,7 +1271,7 @@ int main(int argc, char** argv) {
    	  
   } else { // if (token_source_deleted) // if (global_not_finished) - old code
     if(mpi_rank == 0) {
-      std::cout << "Fuzzy Pattern Matching | Skipping Label Propagation (Interleaved)." << std::endl;
+      std::cout << "Exact Pattern Matching | Skipping Label Propagation (Interleaved)." << std::endl;
     }        
   }
 
@@ -1314,7 +1314,7 @@ int main(int argc, char** argv) {
  
   } else {
     if(mpi_rank == 0) { 
-      std::cout << "Fuzzy Pattern Matching | Skipping Token Passing." << std::endl;
+      std::cout << "Exact Pattern Matching | Skipping Token Passing." << std::endl;
     }
     global_not_finished = false;
   } // do token passing ?
@@ -1322,7 +1322,7 @@ int main(int argc, char** argv) {
   // done token passing // TODO: not useful anymore 
   //double token_passing_time_end = MPI_Wtime();
   //if(mpi_rank == 0) {
-  //  std::cout << "Fuzzy Pattern Matching Time | Token Passing : " 
+  //  std::cout << "Exact Pattern Matching Time | Token Passing : " 
   //    << (token_passing_time_end - token_passing_time_start) << std::endl;
   //}
 
@@ -1337,13 +1337,13 @@ int main(int argc, char** argv) {
   ///////////////////////////////////////////////////////////////////////////// 
 
   // verify global termination condition  
-  //std::cout << "Fuzzy Pattern Matching | Global Not Finished status (local) : " << global_not_finished << std::endl; // Test
+  //std::cout << "Exact Pattern Matching | Global Not Finished status (local) : " << global_not_finished << std::endl; // Test
   //global_not_finished = havoqgt::mpi::mpi_all_reduce(global_not_finished, std::logical_or<bool>(), MPI_COMM_WORLD); // does not work  
   global_not_finished = havoqgt::mpi::mpi_all_reduce(global_not_finished, std::greater<uint8_t>(), MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD); // TODO: might not need this here 
 
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching | Global Finished Status : ";
+    std::cout << "Exact Pattern Matching | Global Finished Status : ";
     if (global_not_finished) {
       std::cout << "Continue" << std::endl;
     } else {
@@ -1355,7 +1355,7 @@ int main(int argc, char** argv) {
 
   double itr_time_end = MPI_Wtime(); 
   if(mpi_rank == 0) { 
-    std::cout << "Fuzzy Pattern Matching Time | Pattern [" << ps 
+    std::cout << "Exact Pattern Matching Time | Pattern [" << ps 
       << "] | Iteration [" << global_itr_count << "] : " 
       << itr_time_end - itr_time_start << std::endl;  
   }
@@ -1384,12 +1384,12 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD);  
   double pattern_time_end = MPI_Wtime();
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching Time | Pattern [" << ps << "] : " 
+    std::cout << "Exact Pattern Matching Time | Pattern [" << ps << "] : " 
       << pattern_time_end - pattern_time_start << std::endl;
   }
    
   if(mpi_rank == 0) {
-    std::cout << "Fuzzy Pattern Matching | Pattern [" << ps 
+    std::cout << "Exact Pattern Matching | Pattern [" << ps 
       << "] | # Iterations : " << global_itr_count << std::endl;
   }
  
@@ -1453,7 +1453,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  // cleanup memeory
+  // cleanup 
   //vertex_rank.clear(); // TODO: add clear() method to vertex_data.cpp   
   //vertex_active.clear(); // TODO: add clear() method to vertex_data.cpp
   //vertex_state_map.clear();
